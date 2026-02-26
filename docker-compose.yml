@@ -1,0 +1,116 @@
+version: '3.8'
+
+volumes:
+  mysql_vol:
+    driver: local
+  frappe_data:
+    driver: local
+
+networks:
+  frappe-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "10.10.${PROJECT_IP_NUMBER:-1}.0/24"
+
+services:
+  frappe:
+    container_name: "${FRAPPE_CONTAINER_NAME:-frappe-app}"
+    image: frappe/bench:latest
+    command: sleep infinity
+    restart: unless-stopped
+    environment:
+      - FRAPPE_CONTAINER_NAME=${FRAPPE_CONTAINER_NAME:-frappe-app}
+      - MARIADB_CONTAINER_NAME=${MARIADB_CONTAINER_NAME:-mariadb}
+      - REDIS_CACHE_CONTAINER_NAME=${REDIS_CACHE_CONTAINER_NAME:-redis-cache}
+      - REDIS_QUEUE_CONTAINER_NAME=${REDIS_QUEUE_CONTAINER_NAME:-redis-queue}
+      - REDIS_SOCKETIO_CONTAINER_NAME=${REDIS_SOCKETIO_CONTAINER_NAME:-redis-socketio}
+      - SITE_NAME=${SITE_NAME:-localhost}
+    volumes:
+      - ./${PROJECT_NAME:-frappe}-docker:/workspace:cached
+      - frappe_data:/workspace/sites
+      # Startup scripts
+      - ./frappe-install-v15.sh:/workspace/frappe-install-v15.sh
+      # Backup related
+      - ./${PROJECT_NAME:-frappe}-docker/mariadb-backup:/etc/mariadb-backup
+      - ./backup-scripts/backup_mariadb.sh:/etc/mariadb-backup-scripts/backup_mariadb.sh:ro
+      - ./backup-scripts/mariadbcron:/etc/mariadb-backup-scripts/mariadbcron:ro
+    networks:
+      frappe-network:
+        ipv4_address: "10.10.${PROJECT_IP_NUMBER:-1}.2"
+    ports:
+      - "${FRAPPE_PORT_START:-8000}-${FRAPPE_PORT_END:-8005}:8000-8005"
+      - "${SOCKETIO_PORT_START:-9000}-${SOCKETIO_PORT_END:-9005}:9000-9005"
+    depends_on:
+      - mariadb
+      - redis-cache
+      - redis-queue
+      - redis-socketio
+    working_dir: /workspace
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  mariadb:
+    container_name: "${MARIADB_CONTAINER_NAME:-mariadb}"
+    build: 
+      context: ./custom-mariadb/
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+      - MYSQL_USER=${MYSQL_USER:-frappe}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-frappe123}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-frappe}
+    networks:
+      frappe-network:
+        ipv4_address: "10.10.${PROJECT_IP_NUMBER:-1}.3"
+    volumes:
+      - mysql_vol:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis-cache:
+    container_name: "${REDIS_CACHE_CONTAINER_NAME:-redis-cache}"
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    networks:
+      frappe-network:
+        ipv4_address: "10.10.${PROJECT_IP_NUMBER:-1}.4"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis-queue:
+    container_name: "${REDIS_QUEUE_CONTAINER_NAME:-redis-queue}"
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      frappe-network:
+        ipv4_address: "10.10.${PROJECT_IP_NUMBER:-1}.5"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis-socketio:
+    container_name: "${REDIS_SOCKETIO_CONTAINER_NAME:-redis-socketio}"
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      frappe-network:
+        ipv4_address: "10.10.${PROJECT_IP_NUMBER:-1}.6"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
