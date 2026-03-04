@@ -30,7 +30,7 @@ services:
       - ./${PROJECT_NAME:-frappe}-docker:/workspace:cached
       - frappe_data:/workspace/sites
       # Startup scripts
-      - ./frappe-install-v15.sh:/workspace/frappe-install-v15.sh
+      - ./frappe-init-script.sh:/workspace/frappe-init-script.sh
       # Backup related
       - ./${PROJECT_NAME:-frappe}-docker/mariadb-backup:/etc/mariadb-backup
       - ./backup-scripts/backup_mariadb.sh:/etc/mariadb-backup-scripts/backup_mariadb.sh:ro
