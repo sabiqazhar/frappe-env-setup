@@ -122,6 +122,57 @@ Frappe runs on Python. `bench` (Frappe's CLI) is a Python package. When the Dock
 
 ---
 
+## Installing Docker with Lazydocker (Docker Desktop Alternative)
+
+Docker Desktop is heavy and has licensing restrictions. The lean setup: **Docker Engine** (headless) + **Lazydocker** (terminal UI).
+
+### 1. Install Docker Engine
+
+**Linux (Ubuntu/Debian) — official script:**
+
+```bash
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+# Log out and back in, or run: newgrp docker
+```
+
+**macOS — via Homebrew:**
+
+```bash
+brew install docker docker-compose
+```
+
+**WSL — same as Linux** (install Docker Engine inside WSL, no Docker Desktop needed). Homebrew isn't standard on WSL, use the Linux script below for lazydocker.
+
+### 2. Install Lazydocker
+
+Lazydocker is a terminal UI for Docker — view containers, logs, stats, restart/stop, all from your terminal without leaving it.
+
+**macOS — with Homebrew:**
+
+```bash
+brew install lazydocker
+```
+
+**Linux / WSL — direct install script:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
+```
+
+### 3. Verify
+
+```bash
+docker --version
+docker compose version
+lazydocker --version
+```
+
+Run `lazydocker` in your project folder to see containers, images, volumes, and logs in one screen.  
+(`lazydocker` is a standalone TUI — no Docker Desktop running in the background.)
+
+---
+
 ## Quick Start (Docker - Recommended)
 
 ### 1. Clone and Setup
