@@ -109,7 +109,6 @@ uv pip install -r requirements.txt
 
 Frappe runs on Python. `bench` (Frappe's CLI) is a Python package. When the Docker setup below runs `frappe-init-script.sh`, that script installs Python inside the container automatically — so you don't *need* `uv` for the Docker path. But if you ever:
 
-- Run `bench` commands outside the container
 - Develop custom apps on your host machine
 - Deal with Python version mismatches (classic Frappe pain)
 
@@ -130,7 +129,7 @@ Frappe runs on Python. `bench` (Frappe's CLI) is a Python package. When the Dock
 ```bash
 # Clone the repository
 git clone <your-repo-url>
-cd frappe-init-script
+cd frappe-env-setup
 
 # Create environment file (or copy from template)
 cp .env.project_name .env.local-dev
