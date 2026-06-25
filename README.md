@@ -11,117 +11,6 @@ Local Frappe/ERPNext development environment using Docker and custom installatio
 
 ---
 
-## Installing Python with `uv` (Newbie Guide)
-
-Hey guys! 👋 Before we dive into Frappe, let's get Python on your machine. The old way involves `pyenv`, system package managers, and crying over compile errors. The new way is `uv`.
-
-### What's `uv`?
-
-`uv` is a Python tool that does everything — installs Python itself, creates virtual environments, installs packages, and does it **10-100x faster** than `pip`. Built by the same folks who made Ruff (the fast linter). One binary, zero fuss.
-
-### 1. Install `uv`
-
-**Linux / macOS / WSL:**
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-Restart your terminal, then check it worked:
-
-```bash
-uv --version
-```
-
-### 2. Install Python with `uv`
-
-Pick the Python version your Frappe version needs. Here's the cheat sheet from the Troubleshooting table below:
-
-| Frappe Version | Python | Install command |
-|----------------|--------|----------------|
-| version-16     | 3.14   | `uv python install 3.14` |
-| version-15     | 3.12   | `uv python install 3.12` |
-| version-14     | 3.11   | `uv python install 3.11` |
-
-Example (for Frappe v16):
-
-```bash
-uv python install 3.14
-```
-
-**What just happened?** `uv` downloaded and compiled Python and stashed it in `~/.local/share/uv/python/`. No `sudo`, no system packages, no messing with your OS Python.
-
-List what you've got:
-
-```bash
-uv python list
-```
-
-Pin a version for this project (creates a `.python-version` file):
-
-```bash
-uv python pin 3.14
-```
-
-### 3. Create a Virtual Environment
-
-```bash
-# Stand in your Frappe project folder
-cd ~/frappe-dev
-uv venv
-```
-
-Activate it:
-
-**Linux / macOS / WSL:**
-
-```bash
-source .venv/bin/activate
-```
-
-When you see `(.venv)` in your prompt, it worked.
-
-### 4. Install Packages the `uv` Way
-
-```bash
-uv pip install frappe-bench
-```
-
-Or from a requirements file:
-
-```bash
-uv pip install -r requirements.txt
-```
-
-### Quick Reference
-
-| Command | What it does |
-|---------|-------------|
-| `uv python install 3.14` | Download & compile Python 3.14 |
-| `uv python pin 3.14` | Lock this folder to Python 3.14 |
-| `uv python list` | Show installed Python versions |
-| `uv venv` | Create a `.venv` in the current directory |
-| `uv pip install <pkg>` | Install a package (10x faster than pip) |
-| `uv run script.py` | Run a script without activating the venv |
-| `uv pip freeze` | List installed packages |
-
-### Why This Matters for Frappe 🧠
-
-Frappe runs on Python. `bench` (Frappe's CLI) is a Python package. When the Docker setup below runs `frappe-init-script.sh`, that script installs Python inside the container automatically — so you don't *need* `uv` for the Docker path. But if you ever:
-
-- Develop custom apps on your host machine
-- Deal with Python version mismatches (classic Frappe pain)
-
-...then `uv` saves your day. One command to get the exact Python version, one command to install bench, no conflicts.
-
-### Pro Tips 💡
-
-- **Multiple Python versions?** `uv` keeps them side-by-side. Pin different versions per project.
-- **Lazy activation?** `uv run python myscript.py` works without sourcing `.venv/bin/activate`.
-- **Forgot the pin?** `uv python pin 3.14` fixes it retroactively.
-
----
-
 ## Installing Docker with Lazydocker (Docker Desktop Alternative)
 
 Docker Desktop is heavy and has licensing restrictions. The lean setup: **Docker Engine** (headless) + **Lazydocker** (terminal UI).
@@ -280,7 +169,7 @@ bench logs
 ## Project Structure
 
 ```
-frappe-init-script/
+frappe-env-setup/
 ├── frappe-init-script.sh   # Main installation script
 ├── docker-compose.yml       # Docker services configuration
 ├── run-docker.sh            # Quick Docker launcher
