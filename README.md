@@ -33,7 +33,25 @@ brew install docker docker-compose
 
 **WSL — same as Linux** (install Docker Engine inside WSL, no Docker Desktop needed). Homebrew isn't standard on WSL, use the Linux script below for lazydocker.
 
-### 2. Install Lazydocker
+### 2. Install Docker Compose
+
+**Linux — already included** with the official `get.docker.com` script above. Verify:
+
+docker compose version
+
+**macOS — included** with `brew install docker` above.
+
+**Linux / WSL — standalone install (if missing):**
+
+# Install Docker Compose plugin manually
+DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+mkdir -p $DOCKER_CONFIG/cli-plugins
+curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o $DOCKER_CONFIG/cli-plugins/docker-compose
+chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+
+Verify with `docker compose version`.
+
+### 3. Install Lazydocker
 
 Lazydocker is a terminal UI for Docker — view containers, logs, stats, restart/stop, all from your terminal without leaving it.
 
@@ -49,7 +67,7 @@ brew install lazydocker
 curl -fsSL https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
 ```
 
-### 3. Verify
+### 4. Verify
 
 ```bash
 docker --version
