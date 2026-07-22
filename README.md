@@ -35,21 +35,34 @@ brew install docker docker-compose
 
 ### 2. Install Docker Compose
 
-**Linux — already included** with the official `get.docker.com` script above. Verify:
+Pick your platform and copy the commands below.
 
+**Linux** (already included with `get.docker.com` — just verify):
+
+```bash
 docker compose version
+```
 
-**macOS — included** with `brew install docker` above.
+If missing, use the standalone install (same as WSL below).
+
+**macOS** (included with `brew install docker` above — just verify):
+
+```bash
+docker compose version
+```
 
 **Linux / WSL — standalone install (if missing):**
 
+```bash
 # Install Docker Compose plugin manually
 DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
 mkdir -p $DOCKER_CONFIG/cli-plugins
 curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o $DOCKER_CONFIG/cli-plugins/docker-compose
 chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
 
-Verify with `docker compose version`.
+# Verify
+docker compose version
+```
 
 ### 3. Install Lazydocker
 
